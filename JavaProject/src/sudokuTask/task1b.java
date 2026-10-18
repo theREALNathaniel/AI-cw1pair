@@ -11,6 +11,7 @@ public class task1b {
 		// Using the readFile method to load the sudoku grid into a 2D array.
 		int[][] sudokuGrid = readFile("C:\\Users\\aaron\\OneDrive\\Documents\\Uni Work\\Year 3\\AI and Intelligence Agents\\Coursework 1\\Test-Sudoku.txt");
 		
+		// Testing to see if sudoku has been loaded correctly.
 		for (int y = 0; y < 9; y++) {
 			for (int x = 0; x < 9; x++) {
 				System.out.print(sudokuGrid[y][x] + " ");

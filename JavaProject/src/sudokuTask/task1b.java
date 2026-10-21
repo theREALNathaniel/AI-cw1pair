@@ -11,7 +11,23 @@ public class task1b {
 		// Using the readFile method to load the sudoku grid into a 2D array
 		int[][] sudokuGrid = readFile("C:\\Users\\aaron\\OneDrive\\Documents\\Uni Work\\Year 3\\AI and Intelligence Agents\\Coursework 1\\Test-Sudoku.txt");
 		
-		solveSudoku(sudokuGrid);
+		// Scenario if the sudoku has been solved
+		if (solveSudoku(sudokuGrid) == true) {
+			// Tell the user the sudoku has been solved
+			System.out.println("The sudoku has been solved!");
+			// Display the solved sudoku
+			for (int row = 0; row < 9; row++) {
+				for (int column = 0; column < 9; column++) {
+					System.out.print(sudokuGrid[row][column] + " ");
+				}
+				System.out.println();
+			}
+		}
+		// Scenario if the sudoku has no solution
+		else {
+			System.out.println("The sudoku has no solution.");
+		}
+		
 	}
 	
 	// Method to read the sudoku from a text file and store it in a 2D array
@@ -36,102 +52,75 @@ public class task1b {
 		
 	}
 	
-	public static void solveSudoku(int[][] sudoku) {
+	// Method to solve the sudoku
+	public static boolean solveSudoku(int[][] sudoku) {
 		
-		// Loading in the sudoku
-		int[][] sudokuToSolve = sudoku;
-		// Variable to keep track of if the assignment is invalid or not
-		boolean invalid = false;
-		
-		// Looking at each square in the sudoku
+		// Finding an empty square
 		for (int row = 0; row < 9; row++) {
 			for (int column = 0; column < 9; column++) {
-				// Checking if the chosen square is empty
-				if (sudokuToSolve[row][column] == 0) {
-					// If it is, we try each value until it is not invalid
+				// Checking that the square is empty
+				if (sudoku[row][column] == 0) {
+					// Looping through each value and trying it in the square to see if it is valid or not
 					for (int i = 1; i < 10; i++) {
-						// Reset the invalid variable to false for each new number tried
-						invalid = false;
-						// Look down all the rows to see if the chosen number is repeated
-						for (int r = 0; r < 9; r++) {
-							// Skip over the row we are currently on
-							if (row == r) {
-								continue;
+						// Using the method isValid to check if the assignment is valid or not
+						if (isValid(sudoku, row, column, i) == true) {
+							// If it is, we assign this value to the sudoku square
+							sudoku[row][column] = i;
+							// We now recursively solve the remaining squares, but we check at the same time that we do not need to backtrack
+							if (solveSudoku(sudoku) == true) {
+								return true;
 							}
 							else {
-								// Scenario if we encounter a duplicate element
-								if (sudokuToSolve[r][column] == i) {
-									// Set invalid to true so that we know that the current assignment is invalid
-									invalid = true;
-									// Break out of the loop as there is no need to check the other rows
-									break;
-								}
+								// Since we can't solve the sudoku from this allocation, we backtrack and change reset its value to 0
+								sudoku[row][column] = 0;
 							}
 						}
-						// Checking to see if the assigned variable has already been flagged as invalid
-						if (invalid == true) {
-							// If this is the case, we move onto the next assignment
-							continue;
-						}
-						else {
-							// Looking through each column to see if there is a duplicate element
-							for (int c = 0; c < 9; c++) {
-								// Skipping over the column we have just assigned to
-								if (column == c) {
-									continue;
-								}
-								else {
-									// Scenario if we found a duplicate element
-									if (sudokuToSolve[row][c] == i) {
-										// Flagging the element as invalid
-										invalid = true;
-										// Breaking out of the loop as we now know that the assigned element is invalid
-										break;
-									}
-								}
-							}
-						}
-						// Scenario if the current assignment is invalid, but there are more options
-						if (invalid == true && i < 9) {
-							// Move onto the next assignment
-							continue;
-						}
-						// Scenario if the assignment is invalid, but there are no more options
-						else if(invalid == true && i == 9) {
-							// To be replaced with the backtrack method
-							break;
-						}
-						// Scenario if the assignment is currently valid
-						else {
-							// Assign the square the valid value
-							sudokuToSolve[row][column] = i;
-							// Move on to the next square in the grid
-							break;
-						}
 					}
-				}
-				// Checking to see if we have reached the last box in the sudoku
-				if (row == 8 && column == 8) {
-					// Checking to see if the final input is valid
-					if (invalid == false) {
-						// If it is, then the sudoku has been successfully solved
-						System.out.println("The sudoku has been solved!");
-						System.out.println();
-						// We display the solved sudoku
-						for (int r = 0; r < 8; r++) {
-							for (int c = 0; c < 8; c++) {
-								System.out.print(sudokuToSolve[r][c] + " ");
-							}
-							System.out.println();
-						}
-					}
-					// Scenario if the sudoku has no solution
-					else {
-						System.out.println("The sudoku has no solution.");
-					}
+					// Return false if all values have been tried but none are successful
+					return false;
 				}
 			}
 		}
 		
+		// Scenario when we have looked through all the squares and no empty squares remain
+		return true;
+		
 	}
+	
+	// Method to validate an assignment
+	public static boolean isValid(int[][] sudoku, int r, int c, int value) {
+		
+		// Checking the rows and columns to see if there is a clash
+		for (int count = 0; count < 9; count++) {
+			// Scenario if there is a duplicate element in the rows
+			if (sudoku[r][count] == value) {
+				return false;
+			}
+			// Scenario if there is a duplicate element in the columns
+			if (sudoku[count][c] == value) {
+				return false;
+			}
+		}
+		
+		// Now check the 3 x 3 boxes,
+		
+		// Calculating the top left square of the 3 x 3 box
+		int boxRow = (r / 3) * 3;
+		int boxColumn = (c / 3) * 3;
+		
+		// Checking each square in the 3 x 3 box for duplicate values
+		for (int y = boxRow; y < boxRow + 3; y++) {
+			for (int x = boxColumn; x < boxColumn + 3; x++) {
+				// Scenario if a duplicate value has been found
+				if (sudoku[y][x] == value) {
+					return false;
+				}
+			}
+		}
+		
+		// Returning true if no duplicates have been found, meaning the assigned value is valid
+		return true;
+		
+	}
+	
 }

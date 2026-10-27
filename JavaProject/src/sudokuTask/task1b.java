@@ -5,11 +5,17 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class task1b {
+	
+	// Global variable to keep track of the number of times the program has backtracked to try and solve the sudoku
+	static int numberOfBacktracks = 0;
 
 	public static void main(String[] args) throws FileNotFoundException {
 		
+		// Timer call at the start of the program
+		long startTime = System.nanoTime();
+		
 		// Using the readFile method to load the sudoku grid into a 2D array
-		int[][] sudokuGrid = readFile("C:\\Users\\aaron\\OneDrive\\Documents\\Uni Work\\Year 3\\AI and Intelligence Agents\\Coursework 1\\Test-Sudoku.txt");
+		int[][] sudokuGrid = readFile("C:\\Users\\aaron\\OneDrive\\Documents\\Uni Work\\Year 3\\AI and Intelligence Agents\\Coursework 1\\Hard-Sudoku.txt");
 		
 		// Scenario if the sudoku has been solved
 		if (solveSudoku(sudokuGrid) == true) {
@@ -27,6 +33,17 @@ public class task1b {
 		else {
 			System.out.println("The sudoku has no solution.");
 		}
+		
+		// Timer call after the program has ran
+		long endTime = System.nanoTime();
+		
+		// Calculate the runtime and change it into milliseconds rather than nanoseconds
+		double executionTime  = (endTime - startTime) / 1000000;
+		
+		// Displaying the runtime. 
+		System.out.println();
+		System.out.println("Execution time: " + executionTime + " milliseconds");
+		System.out.println("Number of backtracks: " + numberOfBacktracks);
 		
 	}
 	
@@ -73,6 +90,7 @@ public class task1b {
 							else {
 								// Since we can't solve the sudoku from this allocation, we backtrack and change reset its value to 0
 								sudoku[row][column] = 0;
+								numberOfBacktracks += 1;
 							}
 						}
 					}
